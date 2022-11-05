@@ -3,6 +3,7 @@ import audioop
 import shutil
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 from datetime import datetime
 
 # getWavFileCharacteristics uses wave package to extract sampling rate and number of channels
@@ -74,6 +75,34 @@ def generateWavPlot(fileName, signal):
     plt.xlabel('Time (s)')
     plt.plot(signal)
     plt.savefig('./waveform_graphs/' + fileName + '_' + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + '_.png' )
+
+# createMeanFilter creates
+def createMeanFilter(fileName):
+    with wave.open(fileName, 'rb') as waveFile:
+        sampleRate = waveFile.getframerate()
+        ampWidth = waveFile.getsampwidth()
+        numChannels = waveFile.getnchannels()
+        numFrames = waveFile.getnframes()
+
+        # Extract Raw Audio from multi-channel Wav File
+        signal = waveFile.readframes(numFrames*numChannels)
+        channels = interpret_wav(signal, nFrames, nChannels, ampWidth, True)
+
+        freqRatio = (cutOffFrequency/sampleRate)
+        N = int(math.sqrt(0.196196 + freqRatio**2)/freqRatio)
+
+    # Use moviung average (only on first channel)
+    filtered = getRunningMean(channels[0], N).astype(channels.dtype)
+
+# createWeightedAverageFilter
+
+
+# createMedianFilter
+
+# getRunningMean
+def getRunningMean(x, windowSize):
+  cumsum = np.cumsum(np.insert(x, 0, 0)) 
+  return (cumsum[windowSize:] - cumsum[:-windowSize]) / windowSize
 
 # print('Birds.wav:', getWavFileCharacteristics('./audio_files/Birds.wav'))
 # print('Drum.wav:', getWavFileCharacteristics('./audio_files/Drum.wav'))
