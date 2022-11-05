@@ -53,7 +53,7 @@ def createNewWavFile(originalFile, fileName):
 def plotWavFile(fileName):
     with wave.open(fileName, 'rb') as waveFile:
         samplingRate = waveFile.getframerate()
-        signal = waveFile.readframes(500)
+        signal = waveFile.readframes(samplingRate)
         signal = np.frombuffer(signal, dtype='int16')
 
         if waveFile.getnchannels() == 2:
