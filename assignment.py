@@ -3,7 +3,6 @@ import audioop
 import shutil
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 from datetime import datetime
 from scipy.io import wavfile
 import scipy.signal as sps
