@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 from datetime import datetime
-from scipy import signal
-from scipy.fftpack import fft, fftshift
+from scipy.io import wavfile
+import scipy.signal as sps
 
 # getWavFileCharacteristics uses wave package to extract sampling rate and number of channels
 def getWavFileCharacteristics(file):
@@ -57,7 +57,7 @@ def createNewWavFile(originalFile, fileName):
 def plotWavFile(fileName):
     with wave.open(fileName, 'rb') as waveFile:
         samplingRate = waveFile.getframerate()
-        signal = waveFile.readframes(16000)
+        signal = waveFile.readframes(samplingRate)
         signal = np.frombuffer(signal, dtype='int16')
 
         if waveFile.getnchannels() == 2:
@@ -78,3 +78,30 @@ def generateWavPlot(fileName, signal):
     plt.xlabel('Time (s)')
     plt.plot(signal)
     plt.savefig('./waveform_graphs/' + fileName + '_' + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + '_.png' )
+
+# createFileWithResample creates a new file with a new sampling rate given a file
+def createFileWithResample(fileName):
+    if 'Birds' in fileName: 
+        resample('Birds', fileName)
+    if 'Drum' in fileName:
+        resample('Drum', fileName)
+    if 'Speech' in fileName:
+        resample('Speech', fileName) 
+
+# resample changes the sampling rate of a wav file
+def resample(newFileName, filePath):
+    newRate = 60000
+    samplingRate, data = wavfile.read(filePath)
+
+    # resample data
+    numberOfSamples = round(len(data) * float(newRate) / samplingRate)
+    data = sps.resample(data, numberOfSamples)
+    
+    # convert data from float to int16, so that the resulting wave file can be read properly
+    data /=1.414
+    data *= 32767
+    int16Data = data.astype(np.int16)
+
+    # write resampled data to a new file
+    newFileName = './audio_files/' + newFileName + '_resample_' + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + '.wav'
+    wavfile.write(newFileName, newRate, int16Data)
