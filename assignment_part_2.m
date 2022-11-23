@@ -4,7 +4,7 @@ function meanFilterResult = applyMeanFilter(file, windowSize)
     meanFilterData = movmean(y, windowSize);
     plot(meanFilterData)
     saveas(gcf, sprintf('meanFilter%f.png', windowSize))
-    audiowrite('meanFilter.wav', meanFilterData, 60000);
+    audiowrite('meanFilter.wav', meanFilterData, 16000);
     meanFilterResult = meanFilterData;
 end
 
@@ -15,7 +15,7 @@ function weightedAverageFilterResult = applyWeightedAverageFilter(file, windowSi
     weightedAverageFilterData = filter(b, 1, y);
     plot(weightedAverageFilterData)
     saveas(gcf, sprintf('weightedAverageFilter%f.png', windowSize))
-    audiowrite('weightedAverageFilter.wav', weightedAverageFilterData, 60000);
+    audiowrite('weightedAverageFilter.wav', weightedAverageFilterData, 16000);
     weightedAverageFilterResult = weightedAverageFilterData;
 end
 
@@ -25,6 +25,6 @@ function medianAverageFilter = applyMedianAverageFilter(file, windowSize)
     medianFilterData = medfilt1(y);
     plot(medianFilterData)
     saveas(gcf, sprintf('medianAverageFilter%f.png', windowSize))
-    audiowrite('medianAverageFilter.wav', medianFilterData, 60000);
+    audiowrite('medianAverageFilter.wav', medianFilterData, 16000);
     medianAverageFilterResult = medianFilterData;
 end
