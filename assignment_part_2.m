@@ -22,7 +22,7 @@ end
 % applyMedianAverageFilter creates a plot and wav file based on the filter and returns the filter result
 function medianAverageFilter = applyMedianAverageFilter(file, windowSize)
     [y,~] = audioread(file);
-    medianFilterData = medfilt1(y);
+    medianFilterData = medfilt1(y, windowSize);
     plot(medianFilterData)
     saveas(gcf, sprintf('medianAverageFilter%f.png', windowSize))
     audiowrite('medianAverageFilter.wav', medianFilterData, 16000);
