@@ -1,4 +1,5 @@
 import speech_recognition as sr
+from scipy.io import wavfile
 
 # getNumSyllables returns the number of syllables in the speech clip
 def getNumSyllables(file):
@@ -34,11 +35,35 @@ def getNumSyllables(file):
 # you want. There is no single solution here just make sure you explain your algorithm
 # and determine its advantages and limitations while keeping it simple.
 def getBeatsPerMin(file):
-    return
+    _, data = wavfile.read(file)
+    peakIndexes = []
+    dataLen = len(data)
+    dist = 0
+
+    # cases for when there is one item in array or first or last element is a peak
+    if dataLen == 1:
+        return 0
+
+    # loop through the wav file data and append the indexes of the peaks into an array
+    # increment through the loop by 4 elements to remove more noise
+    for i in range(1, dataLen - 1, 4):
+        if (i > 0 or i < dataLen - 1) and data[i] >= data[i-1] and data[i] <= data[i+1]:
+            peakIndexes.append(i)
+
+    # loop through peak indexes to get mean distance
+    for i, x in enumerate(peakIndexes):
+        dist += data[i+1] - data[i]
+
+    meanPeaksDist = dist/len(peakIndexes)
+
+    bpm = (1/meanPeaksDist)*60
+
+    return bpm
 
 # 3) Detect the silent regions in the birds clip. You need to show at least one plot where
 # your algorithm can detect these regions inside the clip.
 def detectSilentRegions(file):
     return
 
-print(getNumSyllables('./audio_files/Speech.wav'))
+# print(getNumSyllables('./audio_files/Speech.wav'))
+# print(getBeatsPerMin('./audio_files/weighted_average_filter_drums_100000.wav'))
