@@ -27,13 +27,8 @@ def getNumSyllables(file):
 
         return count
 
-# 2) Determine the beats per minute in the drum clip. When you play a drum, there is a
-# sound of clicks that corresponds to the beat (called metronome). This can usually vary
-# from 40 to 210 beats per minute. Beats per minute estimation can be complex and
-# requires software to detect it accurately. I only expect you to come out with a small
-# and easy algorithm that only focuses on the drum hits as the beats or any combination
-# you want. There is no single solution here just make sure you explain your algorithm
-# and determine its advantages and limitations while keeping it simple.
+# getBearsPerMin returns the bpm of the drum file 
+# the drum file has the weighted average filter applied with a window size of 100000
 def getBeatsPerMin(file):
     _, data = wavfile.read(file)
     peakIndexes = []
