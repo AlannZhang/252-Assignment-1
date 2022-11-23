@@ -25,6 +25,6 @@ function medianAverageFilter = applyMedianAverageFilter(file, windowSize)
     medianFilterData = medfilt1(y);
     plot(medianFilterData)
     saveas(gcf, sprintf('medianAverageFilter%f.png', windowSize))
-    audiowrite('medianAverageFilter.wav', weightedAverageFilterData, 60000);
+    audiowrite('medianAverageFilter.wav', medianFilterData, 60000);
     medianAverageFilterResult = medianFilterData;
 end

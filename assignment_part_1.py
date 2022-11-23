@@ -89,7 +89,7 @@ def createFileWithResample(fileName):
 
 # resample changes the sampling rate of a wav file
 def resample(newFileName, filePath):
-    newRate = 60000
+    newRate = 16000
     samplingRate, data = wavfile.read(filePath)
 
     # resample data

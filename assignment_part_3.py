@@ -1,5 +1,9 @@
 import speech_recognition as sr
 from scipy.io import wavfile
+import numpy as np
+from scipy.fft import *
+from scipy.io import wavfile
+import matplotlib.pyplot as plt
 
 # getNumSyllables returns the number of syllables in the speech clip
 def getNumSyllables(file):
@@ -8,7 +12,7 @@ def getNumSyllables(file):
         count = 0
         vowels = 'aeiouy'
 
-        # load audio to memor
+        # load audio to memory
         audioData = r.record(source)
 
         # convert speech to text using Google API
@@ -30,23 +34,26 @@ def getNumSyllables(file):
 # getBearsPerMin returns the bpm of the drum file 
 # the drum file has the weighted average filter applied with a window size of 100000
 def getBeatsPerMin(file):
-    _, data = wavfile.read(file)
+    sampleRate, data = wavfile.read(file)
     peakIndexes = []
-    dataLen = len(data)
     dist = 0
 
+    # extract frequencies from data using fourier transform
+    frequencies = fftfreq(len(data), 1 / sampleRate)
+    freqLen = len(frequencies)
+
     # cases for when there is one item in array or first or last element is a peak
-    if dataLen == 1:
+    if freqLen == 1:
         return 0
 
     # loop through the wav file data and append the indexes of the peaks into an array
-    # increment through the loop by 4 elements to remove more noise
-    for i in range(1, dataLen - 1, 4):
-        if (i > 0 or i < dataLen - 1) and data[i] >= data[i-1] and data[i] <= data[i+1]:
+    # increment through the loop by 2 elements to remove more noise
+    for i in range(1, freqLen - 1, 4):
+        if (i > 0 or i < freqLen - 1) and frequencies[i] >= frequencies[i-1] and frequencies[i] <= frequencies[i+1]:
             peakIndexes.append(i)
 
     # loop through peak indexes to get mean distance
-    for i, x in enumerate(peakIndexes):
+    for i, _ in enumerate(peakIndexes):
         dist += data[i+1] - data[i]
 
     meanPeaksDist = dist/len(peakIndexes)
@@ -55,10 +62,23 @@ def getBeatsPerMin(file):
 
     return bpm
 
-# 3) Detect the silent regions in the birds clip. You need to show at least one plot where
-# your algorithm can detect these regions inside the clip.
+# detectSilentRegions returns the silent regions in the birds file
+# the birds file has the median weighted average filter applied with a window size of 100000
 def detectSilentRegions(file):
-    return
+    sampleRate, data = wavfile.read(file)
+    silentRegions = []
+
+    # Apply fourier transform to extract fequencies
+    frequencies = fftfreq(len(data), 1 / sampleRate)
+
+    # extract indices (seconds) where the frequency is 0
+    # indicating silence in the wav file
+    for i, x in enumerate(frequencies):
+        if x == 0:
+            silentRegions.append(i)
+    
+    return silentRegions
 
 # print(getNumSyllables('./audio_files/Speech.wav'))
 # print(getBeatsPerMin('./audio_files/weighted_average_filter_drums_100000.wav'))
+print(detectSilentRegions('./audio_files/mean_filter_birds.wav'))
