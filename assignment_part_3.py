@@ -31,8 +31,7 @@ def getNumSyllables(file):
 
         return count
 
-# getBearsPerMin returns the bpm of the drum file 
-# the drum file has the weighted average filter applied with a window size of 100000
+# getBeatsPerMin returns the bpm of the drum file 
 def getBeatsPerMin(file):
     sampleRate, data = wavfile.read(file)
     peakIndexes = []
@@ -63,7 +62,6 @@ def getBeatsPerMin(file):
     return bpm
 
 # detectSilentRegions returns the silent regions in the birds file
-# the birds file has the median weighted average filter applied with a window size of 100000
 def detectSilentRegions(file):
     sampleRate, data = wavfile.read(file)
     silentRegions = []
