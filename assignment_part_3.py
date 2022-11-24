@@ -64,7 +64,7 @@ def detectSilentRegions(file):
     silentIndexes = []
 
     # loop through wav file to retrieve indexes where
-    # the amplitude is > 0.01, indicating silence
+    # the amplitude is < 25 and > -25, indicating silence
     for i, x in enumerate(data):
         if x < 25 and x > -25:
             silentIndexes.append(i)
