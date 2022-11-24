@@ -74,7 +74,7 @@ def generateWavPlot(fileName, signal):
     plt.figure(1)
     plt.title('Wave Form: ' + fileName)
     plt.ylabel('Amplitude')
-    plt.xlabel('Time (s)')
+    plt.xlabel('Number of Samples')
     plt.plot(signal)
     plt.savefig('./waveform_graphs/' + fileName + '_' + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + '_.png' )
 
@@ -104,3 +104,5 @@ def resample(newFileName, filePath):
     # write resampled data to a new file
     newFileName = './audio_files/' + newFileName + '_resample_' + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + '.wav'
     wavfile.write(newFileName, newRate, int16Data)
+
+plotWavFile('./audio_files/median_average_filter_drums_30000.wav')

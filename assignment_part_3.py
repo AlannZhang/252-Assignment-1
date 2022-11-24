@@ -4,6 +4,7 @@ import numpy as np
 from scipy.fft import *
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # getNumSyllables returns the number of syllables in the speech clip
 def getNumSyllables(file):
@@ -33,50 +34,49 @@ def getNumSyllables(file):
 
 # getBeatsPerMin returns the bpm of the drum file 
 def getBeatsPerMin(file):
+    # extract data and sample rate
     sampleRate, data = wavfile.read(file)
-    peakIndexes = []
-    dist = 0
+    
+    # peak count
+    count = 0
 
-    # extract frequencies from data using fourier transform
-    frequencies = fftfreq(len(data), 1 / sampleRate)
-    freqLen = len(frequencies)
+    # update peak count (drum hits)
+    for i, _ in enumerate(data, 1):
+        # peak has to be greater then prev and next value
+        # peak value has to be greater then 490 as determined from the graph 
+        # with the median filter applied
+        if i < len(data) - 1 and data[i] > data[i-1] and data[i] > data[i+1] and data[i] > 490:
+            count += 1
 
-    # cases for when there is one item in array or first or last element is a peak
-    if freqLen == 1:
-        return 0
-
-    # loop through the wav file data and append the indexes of the peaks into an array
-    # increment through the loop by 2 elements to remove more noise
-    for i in range(1, freqLen - 1, 4):
-        if (i > 0 or i < freqLen - 1) and frequencies[i] >= frequencies[i-1] and frequencies[i] <= frequencies[i+1]:
-            peakIndexes.append(i)
-
-    # loop through peak indexes to get mean distance
-    for i, _ in enumerate(peakIndexes):
-        dist += data[i+1] - data[i]
-
-    meanPeaksDist = dist/len(peakIndexes)
-
-    bpm = (1/meanPeaksDist)*60
+    # get the duration of the file in seconds then convert to minutes
+    # calculate bpm by dividing count of peaks by duration in minutes
+    fileDurationSeconds = len(data)/sampleRate
+    fileDurationMins = fileDurationSeconds/60
+    bpm = count/fileDurationMins
 
     return bpm
 
 # detectSilentRegions returns the silent regions in the birds file
 def detectSilentRegions(file):
-    sampleRate, data = wavfile.read(file)
-    silentRegions = []
+    # extract data from wav file, and length of data array
+    _, data = wavfile.read(file)
 
-    # Apply fourier transform to extract fequencies
-    frequencies = fftfreq(len(data), 1 / sampleRate)
+    silentIndexes = []
 
-    # extract indices (seconds) where the frequency is 0
-    # indicating silence in the wav file
-    for i, x in enumerate(frequencies):
-        if x == 0:
-            silentRegions.append(i)
-    
-    return silentRegions
+    # loop through wav file to retrieve indexes where
+    # the amplitude is > 0.01, indicating silence
+    for i, x in enumerate(data):
+        if x < 0.01:
+            silentIndexes.append(i)
 
-# print(getNumSyllables('./audio_files/Speech.wav'))
-# print(getBeatsPerMin('./audio_files/weighted_average_filter_drums_100000.wav'))
-print(detectSilentRegions('./audio_files/mean_filter_birds.wav'))
+    silentRegionIndexes = np.array(silentIndexes, dtype=np.uint32)
+
+    # plot the original signal data, along with the silent region
+    plt.plot(data)
+    plt.plot(silentRegionIndexes, data[silentRegionIndexes], 'x', markersize=0.5)
+    plt.title('Silent Regions of Birds File: ')
+    plt.ylabel('Amplitude')
+    plt.xlabel('Number of Samples')
+    plt.savefig('./waveform_graphs/bird_silent_regions_' + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + '_.png' )
+
+    return
