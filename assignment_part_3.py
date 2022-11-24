@@ -66,7 +66,7 @@ def detectSilentRegions(file):
     # loop through wav file to retrieve indexes where
     # the amplitude is > 0.01, indicating silence
     for i, x in enumerate(data):
-        if x < 0.01:
+        if x < 25 and x > -25:
             silentIndexes.append(i)
 
     silentRegionIndexes = np.array(silentIndexes, dtype=np.uint32)
